@@ -107,9 +107,8 @@ end
 # Small/Helper Methods - reduce verbosity
 
 def search_players # This code was called a lot so I made it a method callable with yield
-  game_stats = game_hash
-  game_stats.each {|team, info|
-    game_stats[team][:players].each {|player|
+  game_hash.map {|team, info|
+    game_hash[team][:players].map {|player|
       yield player
     }
   }
@@ -138,31 +137,26 @@ def shoe_size(pname)
 end
 
 def team_colors(tname)
-  game_stats = game_hash
-  result = []
-  game_stats.each {|team, info|
-    if game_stats[team][:team_name] == tname
-      result << game_stats[team][:colors]
+  game_hash.each {|team, info|
+    if game_hash[team][:team_name] == tname
+      return game_hash[team][:colors]
     end
   }
-  result.flatten
 end
 
 def team_names
-  game_stats = game_hash
   result = []
-  game_stats.each {|team, info|
-    result << game_stats[team][:team_name]
+  game_hash.map {|team, info|
+    result << game_hash[team][:team_name]
   }
   result
 end
 
 def player_numbers(tname)
-  game_stats = game_hash
   result = []
-  game_stats.each {|team, info|
-    if game_stats[team][:team_name] == tname
-      game_stats[team][:players].each {|player|
+  game_hash.map {|team, info|
+    if game_hash[team][:team_name] == tname
+      game_hash[team][:players].map {|player|
         result << player[:number]
       }
     end
@@ -171,15 +165,13 @@ def player_numbers(tname)
 end
 
 def player_stats(pname)
-  result = {}
   search_players {|player|
     if player[:player_name] == pname
-      result = player.select {|k,v|
+      return player.select {|k|
         k != :player_name
       }
     end
   }
-  result
 end
 
 def big_shoe_rebounds
@@ -208,18 +200,17 @@ end
 
 # uses a hash to store point totals for teams - possible to improve?
 def winning_team
-  game_stats = game_hash
   score = 0
   team_points = {}
   winning_team = ""
-  game_stats.each {|team, info|
-    game_stats[team][:players].each {|player|
+  game_hash.map {|team, info|
+    game_hash[team][:players].map {|player|
       score += player[:points]
     }
-    team_points[game_stats[team][:team_name]] = score
+    team_points[game_hash[team][:team_name]] = score
     score = 0
   }
-  team_points.each {|team, total_points|
+  team_points.map {|team, total_points|
     if total_points > score
       score = total_points
       winning_team = team
